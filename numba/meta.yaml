@@ -3,7 +3,7 @@ package:
    version: latest
 
 source:
-  git_url: git@github.com:numba/numba.git
+  git_url: https://github.com/numba/numba.git
   # git_tag: 0.10.0
 
 requirements:

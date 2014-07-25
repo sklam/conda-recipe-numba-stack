@@ -1,0 +1,29 @@
+package:
+  name: llvmpy
+  version: latest
+
+source:
+  git_url: https://github.com/llvmpy/llvmpy.git
+#  git_tag: 0.12.0
+
+requirements:
+  build:
+    - llvm
+    - python
+  run:
+    - llvm           [unix]
+    - python
+
+test:
+  requires:
+    - unittest2      [py26]
+  imports:
+    - llvm
+    - llvmpy
+    - llvmpy._api
+    - llvmpy._capsule
+    - llpython
+    - llvm_array
+    - llvm_cbuilder
+
+

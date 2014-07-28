@@ -2,6 +2,9 @@ package:
   name: llvmpy
   version: latest
 
+build:
+  number: 1   # 783c140de20e9e28b4e0d97f4b857c803d6cb3f7
+
 source:
   git_url: https://github.com/llvmpy/llvmpy.git
 #  git_tag: 0.12.0

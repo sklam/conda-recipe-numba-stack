@@ -95,14 +95,24 @@ def run():
             do_testing(stdout)
         except subprocess.CalledProcessError:
             print("Failed")
-            iss = conn_issue()
-            iss.add_labels(failed_label)
-            iss.remove_label(passed_label)
             stdout.flush()
             stdout.seek(0)  # reset read position
             log = stdout.read()
-            iss.create_comment("%s test log\n```\n%s\n```" % (platform, log))
+
+            iss = conn_issue()
             iss.remove_label(test_label)
+            iss.remove_label(passed_label)
+            iss.add_labels(failed_label)
+
+            files = {
+                'numba_testing.txt' : {
+                    'content': log,
+                }
+            }
+
+            gist = iss.create_gist("error log %s" % platform, files)
+            iss.create_comment("%s test failed! see log at: %s" % (
+                                    platform, gist.html_url))
         else:
             print("Passed")
             iss = conn_issue()

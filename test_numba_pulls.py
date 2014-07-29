@@ -93,6 +93,7 @@ def run():
             print("Failed")
             iss.add_labels(failed_label)
             stdout.flush()
+            stdout.seek(0)  # reset read position
             log = stdout.read()
             iss.create_comment("== %s ==\n%s" % (platform, log))
             raise

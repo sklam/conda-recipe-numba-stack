@@ -47,11 +47,12 @@ test:
 """
 
 def do_testing(stdout):
-    PY = ['33']
-    NP = ['18']
+    PY = ['26', '27', '33']
+    NP = ['17', '18']
     for py, np in itertools.product(PY, NP):
         os.environ['CONDA_PY'] = py
         os.environ['CONDA_NPY'] = np
+        print("==", py, np)
         subprocess.check_call("conda build --no-binstar-upload numba_template".split(),
                                stdout=stdout, stderr=subprocess.STDOUT)
 

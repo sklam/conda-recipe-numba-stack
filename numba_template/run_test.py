@@ -1,5 +1,6 @@
 import sys
 import numba
+sys.argv.append('-vb')
 if not numba.test():
     print("Test failed")
     sys.exit(1)

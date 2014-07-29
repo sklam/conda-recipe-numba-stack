@@ -16,7 +16,7 @@ failed_label = 'failed_' + platform
 test_label = 'test_' + platform
 
 ghuser = 'sklam'  # put your user name here
-gh = login(ghuser, getpass('enter password for %s > ' % ghuser))
+ghpass = getpass('enter password for %s > ' % ghuser)
 
 meta_yaml = """
 package:
@@ -47,8 +47,8 @@ test:
 """
 
 def do_testing(stdout):
-    PY = '26', '27', '33'
-    NP = '17', '18'
+    PY = ['33']
+    NP = ['18']
     for py, np in itertools.product(PY, NP):
         os.environ['CONDA_PY'] = py
         os.environ['CONDA_NPY'] = np
@@ -57,8 +57,11 @@ def do_testing(stdout):
 
 def run():
     print("=== Run ===")
+    gh = login(ghuser, ghpass)
     # Get all open issues with test labels
-    issues = gh.iter_repo_issues('sklam', 'numba-testing', state='open',
+    user = 'sklam'
+    repo = 'numba-testing'
+    issues = gh.iter_repo_issues(user, repo, state='open',
                                  labels=test_label)
 
     # Loop through all labels and get corresponding pull-request
@@ -75,13 +78,19 @@ def run():
             head = data['head']
             branch = head['ref']
             clone_url = head['repo']['clone_url']
-            branches.append((iss, branch, clone_url))
+            branches.append((iss.number, branch, clone_url))
     else:
         if not branches:
             print("Nothing to do")
+    del gh
 
 
-    for iss, branch, url in branches:
+    for issnum, branch, url in branches:
+        def conn_issue():
+            gh = login(ghuser, ghpass)
+            iss = gh.issue(user, repo, issnum)
+            return iss
+
         print("==", iss, branch, url, "==")
         with open("numba_template/meta.yaml", 'w') as fyaml:
             fyaml.write(meta_yaml % dict(URL=url, TAG=branch))
@@ -91,16 +100,21 @@ def run():
             do_testing(stdout)
         except:
             print("Failed")
+            iss = conn_issue()
             iss.add_labels(failed_label)
+            iss.remove_label(passed_label)
             stdout.flush()
             stdout.seek(0)  # reset read position
             log = stdout.read()
-            iss.create_comment("== %s ==\n%s" % (platform, log))
+            iss.create_comment("%s test log\n```\n%s\n```" % (platform, log))
             raise
         else:
             print("Passed")
+            iss = conn_issue()
             iss.add_labels(passed_label)
+            iss.remove_label(failed_label)
         finally:
+            iss = conn_issue()
             iss.remove_label(test_label)
 
 

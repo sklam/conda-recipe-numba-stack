@@ -3,6 +3,7 @@ import sys
 import subprocess
 import time
 import tempfile
+import itertools
 from getpass import getpass
 from StringIO import StringIO
 from github3 import GitHub, login

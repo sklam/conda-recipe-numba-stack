@@ -3,10 +3,6 @@ package:
   name: numba
   version: testing
 
-source:
-  git_url: https://github.com/pitrou/numba.git
-  git_tag: var_lifetime
-
 requirements:
   build:
     - numpy

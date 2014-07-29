@@ -91,7 +91,7 @@ def run():
             iss = gh.issue(user, repo, issnum)
             return iss
 
-        print("==", iss, branch, url, "==")
+        print("==", issnum, branch, url, "==")
         with open("numba_template/meta.yaml", 'w') as fyaml:
             fyaml.write(meta_yaml % dict(URL=url, TAG=branch))
 

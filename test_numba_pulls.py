@@ -38,7 +38,7 @@ bld_bat_template = """%s
 if errorlevel 1 exit 1
 
 if "%%PY3K%%"=="1" (
-    rd /s /q %%SP_DIR%%\numpy
+    rd /s /q %%SP_DIR%%\/numpy
 )
 """
 
@@ -81,9 +81,10 @@ def run():
 
         print("==", issnum, branch, url, "==")
 
-        get_master = "git clone https://github.com/numba/numba.git ."
+        get_master = "git clone https://github.com/numba/numba.git numba"
+        change_dir = "cd numba"
         pull_remote = "git pull %s %s" % (url, branch)
-        cmds = '\n'.join([get_master, pull_remote])
+        cmds = '\n'.join([get_master, change_dir, pull_remote])
         with open("numba_template/build.sh", 'w') as fscript:
             fscript.write(build_sh_template % cmds)
         with open("numba_template/bld.bat", 'w') as fscript:

@@ -1,6 +1,7 @@
 from __future__ import print_function, absolute_import
 import sys
 import subprocess
+import time
 import tempfile
 from getpass import getpass
 from StringIO import StringIO
@@ -95,7 +96,7 @@ def run():
             raise
         else:
             print("Passed")
-        	iss.add_labels(passed_label)
+            iss.add_labels(passed_label)
         finally:
             iss.remove_label(test_label)
 
@@ -103,6 +104,7 @@ def run():
 def main():
     while True:
         run()
+        print("Waiting")
         time.sleep(15 * 60)  # every 15 minutes
 
 

@@ -1,0 +1,26 @@
+
+package:
+  name: numba
+  version: testing
+
+source:
+  git_url: https://github.com/pitrou/numba.git
+  git_tag: var_lifetime
+
+requirements:
+  build:
+    - numpy
+    - python
+  run:
+    - python
+    - argparse        [py26]
+    - numpy
+    - llvmpy
+    - cudatoolkit
+
+test:
+  requires:
+    - unittest2      [py26]
+  commands:
+    - pycc -h
+    - numba -h

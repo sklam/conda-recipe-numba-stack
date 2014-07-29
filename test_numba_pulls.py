@@ -93,7 +93,7 @@ def run():
         stdout = tempfile.TemporaryFile()
         try:
             do_testing(stdout)
-        except:
+        except subprocess.CalledProcessError:
             print("Failed")
             iss = conn_issue()
             iss.add_labels(failed_label)
@@ -102,14 +102,12 @@ def run():
             stdout.seek(0)  # reset read position
             log = stdout.read()
             iss.create_comment("%s test log\n```\n%s\n```" % (platform, log))
-            raise
+            iss.remove_label(test_label)
         else:
             print("Passed")
             iss = conn_issue()
             iss.add_labels(passed_label)
             iss.remove_label(failed_label)
-        finally:
-            iss = conn_issue()
             iss.remove_label(test_label)
 
 

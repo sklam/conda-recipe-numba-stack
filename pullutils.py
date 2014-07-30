@@ -26,12 +26,21 @@ class PRTesting(object):
     def test(self):
         self.runtest(sys.stdout)
 
+    def configure(self, url, branch):
+        get_master = "git clone https://github.com/%s/%s.git %s" (self.pr_user,
+                                                                  self.pr_repo)
+        change_dir = "cd %s" % self.pr_repo
+        pull_remote = "git pull %s %s" % (url, branch)
+        cmds = '\n'.join([get_master, change_dir, pull_remote])
+        with open("%s/build.sh" % self.templatedir, 'w') as fscript:
+            fscript.write(self.templates['build.sh'] % cmds)
+        with open("%s/bld.bat" % self.templatedir, 'w') as fscript:
+            fscript.write(self.templates['bld.bat'] % cmds)
+
     def run(self):
         print("=== Run ===")
         # Get all open issues with test labels
-        user = 'sklam'
-        repo = 'numba-testing'
-        issues = self.gh.iter_repo_issues(user, repo, state='open',
+        issues = self.gh.iter_repo_issues(self.user, self.repo, state='open',
                                           labels=self.labels['test'])
 
         # Loop through all labels and get corresponding pull-request
@@ -57,15 +66,7 @@ class PRTesting(object):
         for iss, branch, url in branches:
             print("==", iss, branch, url, "==")
 
-            get_master = "git clone https://github.com/numba/numba.git numba"
-            change_dir = "cd numba"
-            pull_remote = "git pull %s %s" % (url, branch)
-            cmds = '\n'.join([get_master, change_dir, pull_remote])
-            with open("%s/build.sh" % self.templatedir, 'w') as fscript:
-                fscript.write(self.templates['build.sh'] % cmds)
-            with open("%s/bld.bat" % self.templatedir, 'w') as fscript:
-                fscript.write(self.templates['bld.bat'] % cmds)
-
+            self.configure(url, branch)
             stdout = tempfile.TemporaryFile()
             try:
                 self.runtest(stdout)

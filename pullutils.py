@@ -12,7 +12,7 @@ class PRTesting(object):
         self.gh = login(ghuser, getpass())
         self.user = user
         self.repo = repo
-        self.pullrepo = 'https://github.com/%s/%s/pull' % (pr_user, pr_repo)
+        self.pullrepo = 'https://github.com/%s/%s/pull/' % (pr_user, pr_repo)
         self.pr_user = pr_user
         self.pr_repo = pr_repo
         self.templatedir = templatedir

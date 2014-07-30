@@ -1,4 +1,5 @@
 from __future__ import print_function, absolute_import
+import sys
 import tempfile
 from getpass import getpass
 import subprocess
@@ -23,8 +24,7 @@ class PRTesting(object):
         }
 
     def test(self):
-        stdout = subprocess.PIPE
-        self.runtest(stdout)
+        self.runtest(sys.stdout)
 
     def run(self):
         print("=== Run ===")

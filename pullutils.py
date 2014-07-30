@@ -46,7 +46,11 @@ class PRTesting(object):
         # Loop through all labels and get corresponding pull-request
         branches = []
         for iss in issues:
-            firstline = iss.body.strip().splitlines()[0]
+            print("checking issue", iss)
+            lines = iss.body.strip().splitlines()
+            if not lines:
+                continue
+            firstline = lines[0]
             prefix = self.pullrepo
             if firstline.startswith(prefix):
                 prnum = int(firstline[len(prefix):])
@@ -59,6 +63,10 @@ class PRTesting(object):
                 clone_url = head['repo']['clone_url']
                 if data['mergeable']:
                     branches.append((iss, branch, clone_url))
+                else:
+                    print("not mergeable'")
+            else:
+                print('no prefix', prefix)
         else:
             if not branches:
                 print("Nothing to do")

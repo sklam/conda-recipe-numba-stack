@@ -2,31 +2,14 @@ from __future__ import print_function, absolute_import
 import sys
 import subprocess
 import time
-import tempfile
 import os
 import itertools
-from getpass import getpass
-from StringIO import StringIO
-from github3 import GitHub, login
-platform = sys.argv[1]
-print("Platform:", platform)
-
-passed_label = 'passed_' + platform
-failed_label = 'failed_' + platform
-test_label = 'test_' + platform
+from pullutils import PRTesting
 
 ghuser = 'sklam'  # put your user name here
-ghpass = getpass('enter password for %s > ' % ghuser)
 
-def do_testing(stdout):
-    PY = ['26', '27', '33']
-    NP = ['17', '18']
-    for py, np in itertools.product(PY, NP):
-        os.environ['CONDA_PY'] = py
-        os.environ['CONDA_NPY'] = np
-        print("==", py, np)
-        subprocess.check_call("conda build --no-binstar-upload numba_template".split(),
-                               stdout=stdout, stderr=subprocess.STDOUT)
+platform = sys.argv[1]
+print("Platform:", platform)
 
 build_sh_template = """#!/bin/bash
 %s
@@ -35,91 +18,41 @@ $PYTHON setup.py install
 
 bld_bat_template = """%s
 %%PYTHON%% setup.py install
-if errorlevel 1 exit 1
-
-if "%%PY3K%%"=="1" (
-    rd /s /q %%SP_DIR%%\/numpy
-)
 """
 
-def run():
-    print("=== Run ===")
-    gh = login(ghuser, ghpass)
-    # Get all open issues with test labels
-    user = 'sklam'
-    repo = 'numba-testing'
-    issues = gh.iter_repo_issues(user, repo, state='open',
-                                 labels=test_label)
+templates = {
+    'build.sh': build_sh_template,
+    'bld.bat': bld_bat_template,
+}
 
-    # Loop through all labels and get corresponding pull-request
-    branches = []
-    for iss in issues:
-        firstline = iss.body.strip().splitlines()[0]
-        prefix = 'https://github.com/numba/numba/pull/'
-        if firstline.startswith(prefix):
-            prnum = int(firstline[len(prefix):])
-            print("PR", prnum)
-            # Read Pull Request
-            pr = gh.pull_request('numba', 'numba', prnum)
-            data = pr.to_json()
-            head = data['head']
-            branch = head['ref']
-            clone_url = head['repo']['clone_url']
-            if data['mergeable']:
-                branches.append((iss, branch, clone_url))
-    else:
-        if not branches:
-            print("Nothing to do")
 
-    for iss, branch, url in branches:
-        print("==", iss, branch, url, "==")
+class NumbaPRTesting(PRTesting):
+    def runtest(self, stdout):
+        PY = ['26', '27', '33']
+        NP = ['17', '18']
+        for py, np in itertools.product(PY, NP):
+            os.environ['CONDA_PY'] = py
+            os.environ['CONDA_NPY'] = np
+            print("==", py, np)
+            cmd = "conda build --no-binstar-upload %s" % self.templatedir
+            subprocess.check_call(cmd.split(), stdout=stdout,
+                                  stderr=subprocess.STDOUT)
 
-        get_master = "git clone https://github.com/numba/numba.git numba"
-        change_dir = "cd numba"
-        pull_remote = "git pull %s %s" % (url, branch)
-        cmds = '\n'.join([get_master, change_dir, pull_remote])
-        with open("numba_template/build.sh", 'w') as fscript:
-            fscript.write(build_sh_template % cmds)
-        with open("numba_template/bld.bat", 'w') as fscript:
-            fscript.write(bld_bat_template % cmds)
 
-        stdout = tempfile.TemporaryFile()
-        try:
-            do_testing(stdout)
-        except subprocess.CalledProcessError:
-            print("Failed")
-            stdout.flush()
-            stdout.seek(0)  # reset read position
-            log = stdout.read()
-
-            iss.remove_label(test_label)
-            iss.remove_label(passed_label)
-            iss.add_labels(failed_label)
-
-            files = {
-                'numba_testing.txt' : {
-                    'content': log,
-                }
-            }
-
-            gist = gh.create_gist("error log %s" % platform, files)
-            iss.create_comment("%s test failed! see log at: %s" % (
-                                    platform, gist.html_url))
-        else:
-            print("Passed")
-            iss.add_labels(passed_label)
-            iss.remove_label(failed_label)
-            iss.remove_label(test_label)
+prtesting = NumbaPRTesting(platform, 'sklam', 'sklam', 'numba-testing',
+                           'numba', 'numba', 'numba_template', templates)
 
 
 def main():
     while True:
-        run()
+        prtesting.run()
         print("Waiting")
         time.sleep(15 * 60)  # every 15 minutes
 
 
 if __name__ == '__main__':
-    main()
-
+    if '--test' in sys.argv[1:]:
+        prtesting.test()
+    else:
+        main()
 

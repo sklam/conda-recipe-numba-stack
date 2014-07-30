@@ -1,13 +1,13 @@
 package:
   name: numba
-  version: 0.13.4rc1
+  version: 0.13.4rc2
 
 #build:
 #  number: 1   # 4a0d41e32da40b2ee16ca94f36b83f74ea351871
 
 source:
   git_url: https://github.com/numba/numba.git
-  git_tag: 0.13.4rc1
+  git_tag: 0.13.4rc2
 
 requirements:
   build:

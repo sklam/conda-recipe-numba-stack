@@ -5,7 +5,7 @@ import itertools
 import subprocess
 
 PY = '26', '27', '33', '34'
-NPY = '18',  # forget about npy16 for now
+NPY = '17', '18',  # forget about npy16 for now
 
 def but_not(py, npy):
 	return py == '33' and npy == '16'

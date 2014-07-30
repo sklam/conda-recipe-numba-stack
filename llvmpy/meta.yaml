@@ -3,7 +3,7 @@ package:
   version: latest
 
 build:
-  number: 1   # 783c140de20e9e28b4e0d97f4b857c803d6cb3f7
+  number: 2   # 7d7dddeb9ffe36fcc151cb58e3eabd4fdf35b6d5
 
 source:
   git_url: https://github.com/llvmpy/llvmpy.git

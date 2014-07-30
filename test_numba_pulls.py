@@ -52,6 +52,10 @@ def main():
 
 if __name__ == '__main__':
     if '--test' in sys.argv[1:]:
+        argi = sys.argv.index('--test')
+        url = sys.argv[argi + 1]
+        branch = sys.argv[argi + 2]
+        prtesting.configure(url, branch)
         prtesting.test()
     else:
         main()

@@ -66,20 +66,13 @@ def run():
             branch = head['ref']
             clone_url = head['repo']['clone_url']
             if data['mergeable']:
-                branches.append((iss.number, branch, clone_url))
+                branches.append((iss, branch, clone_url))
     else:
         if not branches:
             print("Nothing to do")
-    del gh
 
-
-    for issnum, branch, url in branches:
-        def conn_issue():
-            gh = login(ghuser, ghpass)
-            iss = gh.issue(user, repo, issnum)
-            return iss
-
-        print("==", issnum, branch, url, "==")
+    for iss, branch, url in branches:
+        print("==", iss, branch, url, "==")
 
         get_master = "git clone https://github.com/numba/numba.git numba"
         change_dir = "cd numba"
@@ -99,7 +92,6 @@ def run():
             stdout.seek(0)  # reset read position
             log = stdout.read()
 
-            iss = conn_issue()
             iss.remove_label(test_label)
             iss.remove_label(passed_label)
             iss.add_labels(failed_label)
@@ -110,12 +102,11 @@ def run():
                 }
             }
 
-            gist = iss.create_gist("error log %s" % platform, files)
+            gist = gh.create_gist("error log %s" % platform, files)
             iss.create_comment("%s test failed! see log at: %s" % (
                                     platform, gist.html_url))
         else:
             print("Passed")
-            iss = conn_issue()
             iss.add_labels(passed_label)
             iss.remove_label(failed_label)
             iss.remove_label(test_label)

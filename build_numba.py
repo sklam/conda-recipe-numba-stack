@@ -8,7 +8,7 @@ PY = '26', '27', '33', '34'
 NPY = '17', '18',  # forget about npy16 for now
 
 def but_not(py, npy):
-	return py == '33' and npy == '16'
+	return (py == '33' and npy == '16') or (py == '34' and npy <= '17')
 
 subprocess.check_call("conda config --force --add channels https://conda.binstar.org/sklam".split())
 

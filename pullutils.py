@@ -27,8 +27,8 @@ class PRTesting(object):
         self.runtest(sys.stdout)
 
     def configure(self, url, branch):
-        get_master = "git clone https://github.com/%s/%s.git %s" (self.pr_user,
-                                                                  self.pr_repo)
+        get_master = "git clone https://github.com/%s/%s.git %s" % \
+                        (self.pr_user, self.pr_repo, self.pr_repo)
         change_dir = "cd %s" % self.pr_repo
         pull_remote = "git pull %s %s" % (url, branch)
         cmds = '\n'.join([get_master, change_dir, pull_remote])

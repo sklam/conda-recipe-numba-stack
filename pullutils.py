@@ -9,6 +9,7 @@ from github3 import login
 class PRTesting(object):
     def __init__(self, platform, ghuser, user, repo, pr_user, pr_repo,
                  templatedir, templates):
+        self.platform = platform
         self.gh = login(ghuser, getpass())
         self.user = user
         self.repo = repo

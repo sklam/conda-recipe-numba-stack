@@ -28,9 +28,15 @@ templates = {
 
 class NumbaPRTesting(PRTesting):
     def runtest(self, stdout):
-        PY = ['26', '27', '33']
-        NP = ['17', '18']
-        for py, np in itertools.product(PY, NP):
+        # PY = ['26', '27', '33']
+        # NP = ['17', '18']
+        # for py, np in itertools.product(PY, NP):
+        combintaions = [
+            ('26', '16'),
+            ('27', '17'),
+            ('33', '18'),
+        ]
+        for py, np in combintaions:
             os.environ['CONDA_PY'] = py
             os.environ['CONDA_NPY'] = np
             print("==", py, np)

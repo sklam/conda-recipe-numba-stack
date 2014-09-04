@@ -6,6 +6,12 @@ import subprocess
 
 PY = '26', '27', '33', '34'
 NPY = '16', '17', '18',  # forget about npy16 for now
+VERSIONS = [
+    ('26', '16'),
+    ('27', '17'),
+    ('33', '18'),
+    ('34', '18'),
+]
 
 def but_not(py, npy):
 	return (py >= '33' and npy <= '16') or (py == '34' and npy <= '17')
@@ -13,7 +19,8 @@ def but_not(py, npy):
 subprocess.check_call("conda config --force --add channels https://conda.binstar.org/sklam".split())
 
 try:
-	for py, npy in itertools.product(PY, NPY):
+	# for py, npy in itertools.product(PY, NPY):
+	for py, npy in VERSIONS:
 		if not but_not(py, npy):
 			os.environ['CONDA_PY'] = py
 			os.environ['CONDA_NPY'] = npy
